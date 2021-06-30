@@ -464,22 +464,36 @@ class _VzHistogramTimeseries
     var linePath = d3
       .line()
       .x(function (d) {
-        return xLineScale(xBinCentroid(d));
+        return xLineScale(d[xProp]);
       })
       .y(function (d) {
         return yLineScale(d[yProp]);
       });
+
+          
+    var repeat_points_shifted = function (d){
+      function repeat_inner(v,i){
+        if (i===(d.length-1)){
+          return [v,{[xProp]:v[xProp]+v[dxProp],[yProp]:v[yProp],[dxProp]:v[dxProp]}]
+          }
+        else{
+          return [v,{[xProp]:d[i+1][xProp],[yProp]:d[i][yProp],[dxProp]:d[i][dxProp]},{[xProp]:d[i+1][xProp],[yProp]:0,[dxProp]:d[i][dxProp]}]
+        }
+      }
+
+      return d.flatMap(repeat_inner)
+    }
     var path = function (d) {
       // Draw a line from 0 to the first point and from the last point to 0.
       return (
         'M' +
-        xLineScale(xBinCentroid(d[0])) +
+        xLineScale(d[0].x) +
         ',' +
         yLineScale(0) +
         'L' +
-        linePath(d).slice(1) +
+        linePath(repeat_points_shifted(d)).slice(1) +
         'L' +
-        xLineScale(xBinCentroid(d[d.length - 1])) +
+        xLineScale(d[d.length - 1][xProp]+d[d.length - 1][dxProp]) +
         ',' +
         yLineScale(0)
       );
