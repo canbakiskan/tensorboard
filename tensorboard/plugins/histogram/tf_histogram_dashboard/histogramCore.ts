@@ -84,7 +84,7 @@ export function intermediateToD3(
   histogram: IntermediateHistogram,
   min: number,
   max: number,
-  numBins = 30
+  numBins = 50
 ): D3HistogramBin[] {
   if (max === min) {
     // Create bins even if all the data has a single value.
